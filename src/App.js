@@ -1,25 +1,27 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { Component } from "react";
+import * as config from "./config";
+const uri = `https://github.com/login/oauth/authorize?client_id=${
+  config.CLIENT_ID
+}&scope=repo&redirect_uri=${config.REDIRECT_URI}`;
 class App extends Component {
+  componentDidMount() {
+    let code;
+    if (window.location.href.match(/code=(.*)/)) {
+      code = window.location.href.match(/code=(.*)/)[1];
+    }
+
+    if (code) {
+      fetch(`http://localhost:9999/authenticate/${code}`).then(res => {
+        res.json().then(({ token }) => {
+          localStorage.setItem("token", token);
+        });
+      });
+    }
+  }
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <a href={uri}>authorize with github</a>
       </div>
     );
   }
